@@ -99,35 +99,51 @@ Where:
 ## Program
 
 ```python
-
+V = np.zeros(n_states)
 
 # -------------------------------------------------
 # Policy Evaluation Function
 # -------------------------------------------------
 
+def policy_evaluation(env, policy, gamma=0.99, theta=1e-8):
 
-# -------------------------------------------------
-# Display Output
-# -------------------------------------------------
+    V = np.zeros(env.observation_space.n)
+    iteration = 0
 
-# Change the parameters and observe the results
+    while True:
+        delta = 0
 
-```
+        for s in range(env.observation_space.n):
+            v = V[s]
+            new_v = 0
+
+            # Bellman Expectation Equation
+            for a, action_prob in enumerate(policy[s]):
+                for prob, next_state, reward, done in env.P[s][a]:
+                    new_v += action_prob * prob * (
+                        reward + gamma * V[next_state] * (not done)
+                    )
+
+            V[s] = new_v
+            delta = max(delta, abs(v - V[s]))
+
+        iteration += 1
+
+        if delta < theta:
+            break
+
+
+
+
+
+    return V, iteration
 
 ---
 
 ## Output
-
-```text
-
-Number of Iterations: 
-
-State-Value Function as 4x4 Grid:
+<img width="690" height="348" alt="Screenshot 2026-07-28 160946" src="https://github.com/user-attachments/assets/87d21b17-bcb3-44a2-bcee-2c315567a72b" />
 
 
-
-```
----
 
 ## Result
 
