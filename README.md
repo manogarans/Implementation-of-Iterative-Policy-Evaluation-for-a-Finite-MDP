@@ -138,6 +138,23 @@ def policy_evaluation(env, policy, gamma=0.99, theta=1e-8):
 
     return V, iteration
 
+
+V, iterations = policy_evaluation(env, policy, gamma, theta)
+
+print("Name: MANOGARAN S            ")
+print("Register Number:212223240081   ")
+print("Number of iterations:", iterations)
+print("\nState-Value Function:")
+print(V)
+
+print("Name:MANOGARAN S             ")
+print("Register Number:212223240081   ")
+print("\nState-Value Function as 4x4 Grid:")
+print(np.round(V.reshape(4, 4), 4))
+
+env.close()
+
+
 ---
 ```
 ## Output
