@@ -97,82 +97,146 @@ Where:
 ---
 
 ## Program
+```
+import gymnasium as gym
+import numpy as np
 
-```python
-V = np.zeros(n_states)
+# -------------------------------------------------
+# Create FrozenLake environment
+# -------------------------------------------------
+
+env = gym.make("FrozenLake-v1", map_name="4x4", is_slippery=True)
+
+# Access transition model
+env = env.unwrapped
+
+# Number of states and actions
+n_states = env.observation_space.n
+n_actions = env.action_space.n
+
+# Parameters
+gamma = 0.99
+theta = 1e-8
+
+# Random policy: each action has equal probability
+policy = np.ones((n_states, n_actions)) / n_actions
+
 
 # -------------------------------------------------
 # Policy Evaluation Function
 # -------------------------------------------------
 
 def policy_evaluation(env, policy, gamma=0.99, theta=1e-8):
+    """
+    Performs iterative policy evaluation using the Bellman expectation equation.
 
+    Returns:
+        V : Estimated state-value function
+        iteration : Number of iterations used for convergence
+    """
+
+    # Initialize value function
     V = np.zeros(env.observation_space.n)
+
     iteration = 0
 
     while True:
+
         delta = 0
 
+        # Loop through all states
         for s in range(env.observation_space.n):
-            v = V[s]
-            new_v = 0
 
-            # Bellman Expectation Equation
+            old_value = V[s]
+
+            new_value = 0
+
+            # Loop through actions
             for a, action_prob in enumerate(policy[s]):
+
+                # Get transition information
                 for prob, next_state, reward, done in env.P[s][a]:
-                    new_v += action_prob * prob * (
+
+                    new_value += action_prob * prob * (
                         reward + gamma * V[next_state] * (not done)
                     )
 
-            V[s] = new_v
-            delta = max(delta, abs(v - V[s]))
+            V[s] = new_value
+
+            # Calculate maximum change
+            delta = max(delta, abs(old_value - V[s]))
+
 
         iteration += 1
 
+        # Check convergence
         if delta < theta:
             break
-
-
-
-
 
     return V, iteration
 
 
+
+# -------------------------------------------------
+# Run Policy Evaluation
+# -------------------------------------------------
+
 V, iterations = policy_evaluation(env, policy, gamma, theta)
 
-print("Name: MANOGARAN S            ")
-print("Register Number:212223240081   ")
-print("Number of iterations:", iterations)
+
+# -------------------------------------------------
+# Display Output
+# -------------------------------------------------
+
+print("Name: MANOGARAN S")
+print("Register Number: "212223240081")
+
+print("\nNumber of Iterations:", iterations)
+
 print("\nState-Value Function:")
 print(V)
 
-print("Name:MANOGARAN S             ")
-print("Register Number:212223240081   ")
 print("\nState-Value Function as 4x4 Grid:")
-print(np.round(V.reshape(4, 4), 4))
 
+print(np.round(V.reshape(4,4),4))
+
+
+# Close environment
 env.close()
-
-
----
 ```
+
 ## Output
-<img width="690" height="348" alt="Screenshot 2026-07-28 160946" src="https://github.com/user-attachments/assets/87d21b17-bcb3-44a2-bcee-2c315567a72b" />
+
+```
+
+Number of iterations: 54
+
+State-Value Function:
+[0.01235611 0.01042444 0.01933842 0.00947774 0.01478704 0.
+ 0.03889445 0.         0.03260247 0.08433764 0.13781085 0.
+ 0.         0.17034482 0.43357944 0.        ]
 
 
+State-Value Function as 4x4 Grid:
+[[0.0124 0.0104 0.0193 0.0095]
+ [0.0148 0.     0.0389 0.    ]
+ [0.0326 0.0843 0.1378 0.    ]
+ [0.     0.1703 0.4336 0.    ]]
+
+
+
+
+```
+---
 
 ## Result
 
 Iterative policy evaluation was implemented successfully using the Gymnasium FrozenLake environment. The state-value function for the fixed random policy was estimated using the Bellman expectation equation.
 
+---
 
 ## Inference
 
+The experiment demonstrates how a value function can be estimated by repeatedly applying Bellman's expectation equation until convergence.
 
-
-
-
----
-
-
+The number of iterations depends on the discount factor, convergence threshold, and environment transition probabilities.
